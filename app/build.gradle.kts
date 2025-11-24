@@ -38,6 +38,7 @@ android {
 
 dependencies {
 
+    implementation(libs.moshi.kotlin)
     implementation(libs.androidx.recyclerview)
     implementation(libs.glide)
     implementation(libs.retrofit)
