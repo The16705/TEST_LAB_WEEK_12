@@ -1,3 +1,4 @@
+// File: app/src/main/java/com/example/test_lab_week_12/MainActivity.kt
 package com.example.test_lab_week_12
 
 import android.content.Intent
@@ -11,8 +12,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test_lab_week_12.model.Movie
 import com.google.android.material.snackbar.Snackbar
-import java.util.Calendar
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
     private val movieAdapter by lazy {
@@ -41,22 +42,23 @@ class MainActivity : AppCompatActivity() {
             }
         )[MovieViewModel::class.java]
 
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR).toString()
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     movieViewModel.popularMovies.collect { movies ->
-                        val filtered = movies
-                            .filter { it.releaseDate?.startsWith(currentYear) == true }
+                        val currentYear = Calendar.getInstance().get(Calendar.YEAR).toString()
+                        val filteredAndSorted = movies
+                            .filter { movie ->
+                                movie.releaseDate?.startsWith(currentYear) == true
+                            }
                             .sortedByDescending { it.popularity }
-                        movieAdapter.addMovies(filtered)
+                        movieAdapter.addMovies(filteredAndSorted)
                     }
                 }
                 launch {
-                    movieViewModel.error.collect { error ->
-                        if (error.isNotEmpty()) {
-                            Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show()
+                    movieViewModel.error.collect { errorMsg ->
+                        if (errorMsg.isNotEmpty()) {
+                            Snackbar.make(recyclerView, errorMsg, Snackbar.LENGTH_LONG).show()
                         }
                     }
                 }
